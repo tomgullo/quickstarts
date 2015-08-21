@@ -1,0 +1,24 @@
+ Database transactions should be all or nothing.  All database changes should occur or none.  Let’s look at transactions in practice with an example that saves a one-to-many relationship.  An example of a one-to-many relationship could be an Author object that has many Book objects.
+
+When a one-to-many relationship is saved, first the parent object is saved, followed by the children objects. Suppose the parent is first saved but something happens while the child is being saved. This could leave the database in a bad state. The user intended to save both the parent and the children, not just the parent.
+
+Here is the underlying sql saving a parent and a child. Author is the parent; Book is the child.
+
+Insert into author(name) values('Hemingway')
+Insert into book(name, year_published, author_id) values('For Whom the Bell Tolls', 1940, 1) 
+
+Now suppose we set at the database level year_published to not null, but we set year published in our Book object to nullable? That would enable a book without a year_published value to get through the validation but fail during the database insert. That also allows us to test transactions. If the author is saved but not the book then the transactions aren’t working.
+
+With Grails transactions are pretty easy. Just put your code in a service and the services are by default transactional. Also, you can easily apply programmatic transactions by wrapping your code in transactional logic:
+
+Author.withTransaction { status ->
+  def book = new Book(name:’For Whom the Bell Tolls’)
+  def author = new Author(name:’Earnest Hemmingway’)
+  author.addToBooks(book)
+  if (author.save(flush:true)) {
+  } else {
+    status.setRollbackOnly()
+  }
+} //end transaction
+
+Note: Some blogs claim you can put the annotation @Transactional in a Controller method and your code will be transactional. I tested this and it’s not true for Grails 2.4.3.

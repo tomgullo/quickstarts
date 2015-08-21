@@ -1,0 +1,15 @@
+Hadoop is great for storing and retrieving files. Here are some steps for storing and retreiving files in Hadoop.
+
+The script below will create a Hadoop archive from files stored on your local directory
+
+#!/bin/sh
+hadoop archive -archiveName myarchive.har -p /User/directory hdfs:(namenode):8020/
+
+You may find that Hadoop has a problem with some of your files. It doesn’t like file names with spaces, or special characters like [,( or %. Here is a script that will clean up those files:
+#!/bin/sh
+find (directory) -depth -name "* *" -execdir bash -c 'mv "$1&" "${1// /_}"' _ {} \;
+
+If you want to view the files in your archive run this command:
+#!/bin/sh
+hadoop fs -ls -R har://hdfs-(namenode domain):8020/myarchive.har | grep -v ^d | grep -o har://.*
+
