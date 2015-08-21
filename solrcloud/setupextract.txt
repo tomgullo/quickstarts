@@ -1,0 +1,14 @@
+First, put the libraries in a folder accessible by all SolrCloud servers. 
+You will need the contrib/extraction libraries found in the regular Solr distribution, as well as the solr-cell* one found in SolrCloud.
+
+Second, you’ll need to update the lib tag in solrconfig to point to the right folder.
+
+Finally, you’ll need to add the following request handler to solrconfig:
+
+<requestHandler name=“/update/extract” class=“org.apache.solr.handler.extraction.ExtractingRequestHandler”>
+  <lst name=“default”>
+    <str name=“uprefix”>ignored_</str>
+  </lst>
+</requestHandler>
+
+Test the above by going to /update/extract using params extractOnly=true and extractFormat=text -F “thefile=@file”
