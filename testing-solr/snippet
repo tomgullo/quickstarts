@@ -1,0 +1,21 @@
+//setup test server
+System.setProperty("solr.directoryFactory", "solr.RAMDirectoryFactory");
+System.setProperty("solr.solr.home", "solr");
+solrDir = new File(LuceneTestCase.TEMP_DIR, "testDir");
+solrDir.mkdirs();
+solrConfig = TestHarness.createConfig("solr", "myCollection", 
+    "path/in/resources/to/solrconfig.xml");
+testHarness = new TestHarness("myCollection", solrDir.getAbsolutePath(), 
+    solrConfig, "path/in/resources/to/schema.xml");
+testSolrServer = new EmbeddedSolrServer(testHarness.getCoreContainer(), 
+    testHarness.getCore().getName());
+Then you override your Java object that handles Solr queries:
+
+//create anonymous class that that overrides 
+// the method to get a solr server
+mySolrObject = new MySolrObject() {
+    @Override
+    protected SolrServer getSolrServer() {
+        return testSolrServer
+    }
+};
