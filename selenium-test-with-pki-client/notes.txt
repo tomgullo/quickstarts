@@ -1,0 +1,54 @@
+Functional tests can be difficult. Many things can get in your way.  Maybe your test environment requires you to use a client certificate. How can your bot access the server?  Maybe your UI uses Ajax calls that don’t render until after the page loads.
+
+Let’s look at an example of testing an app using Selenium.  With Selenium you can create a Web driver based on a browser profile you have on your machine.  
+
+def profileDirLocation = "/home/ubuntu64/.mozilla/firefox/asdfsdf.default/"
+def  driver = new FirefoxDriver(new FirefoxProfile(new File(profileDirLocation)))
+Here’s a simple example:
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.*;
+ 
+import java.util.concurrent.TimeUnit
+ 
+import org.openqa.selenium.By
+import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.WebDriverWait
+import org.openqa.selenium.support.ui.Select
+ 
+import org.openqa.selenium.Keys
+ 
+import org.openqa.selenium.WebElement
+ 
+def profileDirLocation = "/home/ubuntu64/.mozilla/firefox/asdfsdf.default/"
+def  driver = new FirefoxDriver(new FirefoxProfile(new File(profileDirLocation)))
+ 
+println "start test"
+ 
+def url = "https://myurl"
+driver.get(url)
+ 
+//wait for the form
+def theForm = (new WebDriverWait(driver, 20)).until(ExpectedConditions.presenceOfElementLocated(By.name("myForm")));
+ 
+//set tableName and tableType
+driver.findElement(By.name("myName")).sendKeys("autoTest" + System.currentTimeMillis())
+new Select(driver.findElement(By.name("myType"))).selectByVisibleText("myval");
+ 
+//sync up with Angular
+driver.executeScript("angular.element(document.body).injector().get('\$rootScope').\$apply();");
+ 
+//get the table being sent to the server
+def object = driver.executeScript("return angular.element(arguments[0]).scope().myobject;", theForm)
+println 'object to be sent ' + object
+ 
+//submit
+theForm.submit()
+ 
+//wait until the message says success
+(new WebDriverWait(driver, 20)).until(
+    ExpectedConditions.textToBePresentInElement(
+        By.id("AlertMessage"), 'created successfully'));
+ 
+println "success"
